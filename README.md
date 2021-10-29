@@ -1,0 +1,2 @@
+# sin
+Simple Init Notation
