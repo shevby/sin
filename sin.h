@@ -81,3 +81,7 @@ public:
 
 };
 
+int testSin() {
+
+    return 0;
+}

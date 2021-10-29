@@ -5,4 +5,4 @@ set(SOURCES
     SinValue.cpp
     )
 
-add_library(sin ${SOURCES})
+add_library(sin SHARED ${SOURCES})

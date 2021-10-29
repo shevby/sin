@@ -1,4 +1,4 @@
-#include "Sin.h"
+#include "sin.h"
 
 Sin::Sin()
 {
