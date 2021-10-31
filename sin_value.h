@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 class Sin;
 
@@ -20,23 +21,24 @@ struct SinValue {
 };
 
 
-SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Uint8Value, uint8_t);
-SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Int8Value, int8_t);
-SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Uint16Value, uint16_t);
-SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Int16Value, int16_t);
-SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Uint32Value, uint32_t);
-SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Int32Value, int32_t);
-SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Uint64Value, uint64_t);
-SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Int64Value, int64_t);
-SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(FloatValue, float);
-SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(DoubleValue, double);
-SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(StringValue, std::string);
+SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Uint8, uint8_t);
+SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Int8, int8_t);
+SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Uint16, uint16_t);
+SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Int16, int16_t);
+SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Uint32, uint32_t);
+SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Int32, int32_t);
+SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Uint64, uint64_t);
+SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Int64, int64_t);
+SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Float, float);
+SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Double, double);
+SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(String, std::string);
 
 
-struct ArrayValue : SinValue {
 
+struct Array : SinValue {
+    std::vector<Sin> value;
 };
 
-struct ObjectValue : SinValue {
+struct Object : SinValue {
 
 };

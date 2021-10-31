@@ -1,8 +1,15 @@
 cmake_minimum_required(VERSION 3.5)
 
+set(CMAKE_BUILD_TYPE, Debug)
+
+find_package(Boost REQUIRED)
+
 set(SOURCES
-    Sin.cpp
-    SinValue.cpp
+    sin.cpp
+    sin_value.cpp
     )
 
-add_library(sin SHARED ${SOURCES})
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+
+add_library(sin SHARED ${SOURCES} )
+target_link_libraries(sin PUBLIC ${Boost_LIBRARIES})
