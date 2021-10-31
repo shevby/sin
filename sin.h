@@ -14,6 +14,7 @@
 #include <boost/stacktrace.hpp>
 
 #include "sin_value.h"
+#include "switch.h"
 
 #define SIN_STANDARD_TYPE_SETTER(SIN_TYPE, STANDARD_TYPE)\
     Sin(const STANDARD_TYPE & value) {\
@@ -36,11 +37,41 @@
     }
 
 
+const int PAD_SIZE = 2;
+
+
+std::string getPadStr(int pads = 0) {
+    std::string padStr = "";
+
+    for(int i = 0; i < pads * PAD_SIZE; i++) {
+        padStr += " ";
+    }
+
+    return padStr;
+}
+
 class Sin
 {
 
     std::shared_ptr<SinValue> _value;
     std::string _type;
+
+    std::string _toString(int pads = 0, std::string path = "") {
+        if(_type != "Array" && _type != "Object") {
+
+            if(_type == "String") {
+                return stringToString(*this);
+            }
+
+            return numberToString(*this, pads);
+        }
+
+        if(_type == "Array") {
+            return arrayToString(*this, pads, path);
+        }
+
+        return objectToString(*this, pads, path);
+    }
 
 public:
 
@@ -112,8 +143,6 @@ public:
 
     Sin & operator[](const int index) {
 
-        
-
         if(_type != "Array") {
             _type = "Array";
             _value = std::make_shared<Array>();
@@ -144,17 +173,83 @@ public:
         return dynamic_cast<Object*>(_value.get())->value[key];
     }
 
+    std::string toString() {
+        return this->_toString();
+    }
+
+    static std::string numberToString(const Sin & s, int pads = 0) {
+
+#define NUMBER_CASE(SIN_TYPE)\
+.Case(#SIN_TYPE, [&]()->void{\
+    strValue = std::to_string(s.as ##SIN_TYPE());\
+})
+
+        std::string strValue;
+
+        Switch<std::string>(s._type)
+        NUMBER_CASE(Uint8)
+        NUMBER_CASE(Int8)
+        NUMBER_CASE(Uint16)
+        NUMBER_CASE(Int16)
+        NUMBER_CASE(Uint32)
+        NUMBER_CASE(Int32)
+        NUMBER_CASE(Uint64)
+        NUMBER_CASE(Int64)
+        NUMBER_CASE(Float)
+        NUMBER_CASE(Double)
+        .exec();
+
+        auto padStr = getPadStr(pads);
+
+        return ": " + s._type + "\n" + padStr + strValue + "\n";
+    }
+
+    static std::string stringToString(const Sin & s) {
+        return ": `" + s.asString() + "`\n";
+    }
+
+    std::string arrayToString(Sin & s, int pads = 0, std::string path = "") {
+        std::string result = ": Array\n";
+        auto v = s.asArray();
+
+        auto padStr = getPadStr(pads + 1);
+        
+        
+        for(int i = 0; i < v.size(); i++) {
+            result += padStr + path + "[" + std::to_string(i) + "]" + v[i]._toString(pads + 1, "[" + std::to_string(i) + "]");
+        }
+
+        return result;
+    }
+
+    std::string objectToString(Sin & s, int pads = 0, std::string path = "") {
+        std::string result = ": Object\n";
+        auto object = s.asObject();
+
+        auto padStr = getPadStr(pads + 1);
+        
+        for(auto el : object) {
+            auto newPath = path + (el.first.find(' ') == std::string::npos ? ("." + el.first) : ("[" + el.first + "]"));
+            result += padStr + newPath + el.second._toString(pads + 1, newPath);
+        }
+
+        return result;
+    }
 
 };
 
 
 int testSin() {
     using namespace std;
-    Sin a = 5;
-    a[10]["lol"] = 5;
+    Sin a;
 
-    cout << a.asArray()[10].asObject()["lol"].asInt32() << endl;
-    cout << a[10]["lol"].asInt32() << endl;
+    a["first"]["third one"] = 5;
+    a["first"]["second one"] = {1,2,3,4};
+    a["first"]["third one"]["another"] = "hey";
+    a["first"]["second one"].asArray().push_back("there");
+
+    cout << a.toString() << endl;
+    
 
     return 0;
 }
