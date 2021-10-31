@@ -26,9 +26,9 @@
     }
 
 #define SIN_STANDARD_TYPE_GETTER(SIN_TYPE, STANDARD_TYPE)\
-    STANDARD_TYPE get ## SIN_TYPE() const {\
+    STANDARD_TYPE as ## SIN_TYPE() const {\
         if(_type != #SIN_TYPE) {\
-            std::cout << "\nType assertion. Requested type: " #SIN_TYPE ", Actual type: " + _type << std::endl << std::endl;\ 
+            std::cout << "\nType assertion. Requested type: " #SIN_TYPE ", Actual type: " + _type << std::endl << std::endl;\
             std::cout << "StackTrace:\n" << boost::stacktrace::stacktrace() << std::endl;\
             throw "Type assertion. Requested type: " #SIN_TYPE ", Actual type: " + _type;\ 
         }\
@@ -44,7 +44,10 @@ class Sin
 
 public:
 
-    Sin();
+    Sin() {
+        _type = "Object";
+        _value = std::make_shared<Object>();
+    }
 
     std::string type() {
         return _type;
@@ -74,6 +77,24 @@ public:
     SIN_STANDARD_TYPE_GETTER(Double, double);
     SIN_STANDARD_TYPE_GETTER(String, std::string);
 
+    std::vector<Sin> & asArray() {
+        if(_type != "Array") {
+            std::cout << "Type assertion. Requested type: Array, Actual type: " + _type << std::endl << std::endl;
+            std::cout << "StackTrace:\n" << boost::stacktrace::stacktrace() << std::endl;
+            throw "Type assertion. Requested type: Array, Actual type: " + _type;
+        }
+        return dynamic_cast<Array*>(_value.get())->value;
+    }
+
+    std::unordered_map<std::string, Sin> & asObject() {
+        if(_type != "Object") {
+            std::cout << "Type assertion. Requested type: Object, Actual type: " + _type << std::endl << std::endl;
+            std::cout << "StackTrace:\n" << boost::stacktrace::stacktrace() << std::endl;
+            throw "Type assertion. Requested type: Object, Actual type: " + _type;
+        }
+        return dynamic_cast<Object*>(_value.get())->value;
+    }
+
     Sin(const char * str) {
         _type = "String";
         _value = std::make_shared<String>(std::string(str));
@@ -91,12 +112,36 @@ public:
 
     Sin & operator[](const int index) {
 
-        if(_type != "Array" && _type != "Object") {
-            std::cout << boost::stacktrace::stacktrace() << std::endl;
-            throw "Is not Array. Actual type" + _type;
+        
+
+        if(_type != "Array") {
+            _type = "Array";
+            _value = std::make_shared<Array>();
+
+            auto v = dynamic_cast<Array*>(_value.get());
+
+            for(int i = 0; i <= index; i++) {
+                v->value.push_back(Sin{});
+            }
         }
 
         return dynamic_cast<Array*>(_value.get())->value[index];
+    }
+
+    Sin & operator[](const std::string & key) {
+
+        if(_type != "Object") {
+            _type = "Object";
+            _value = std::make_shared<Object>();
+        }
+
+        auto v = dynamic_cast<Object*>(_value.get())->value;
+        
+        if(!v.contains(key)) {
+            v[key] = Sin{};
+        }
+
+        return dynamic_cast<Object*>(_value.get())->value[key];
     }
 
 
@@ -105,10 +150,11 @@ public:
 
 int testSin() {
     using namespace std;
-    Sin a = {1, 4.55, "123"};
-    
-    cout << a[2].type() << endl;
-    cout << a[2].getString() << endl;
+    Sin a = 5;
+    a[10]["lol"] = 5;
+
+    cout << a.asArray()[10].asObject()["lol"].asInt32() << endl;
+    cout << a[10]["lol"].asInt32() << endl;
 
     return 0;
 }

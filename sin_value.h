@@ -40,5 +40,9 @@ struct Array : SinValue {
 };
 
 struct Object : SinValue {
+    std::unordered_map<std::string, Sin> value;
+};
 
+struct Undefined : SinValue {
+    const std::string value = "Undefined";
 };
