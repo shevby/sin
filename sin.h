@@ -214,9 +214,8 @@ public:
 
         auto padStr = getPadStr(pads + 1);
         
-        
         for(int i = 0; i < v.size(); i++) {
-            result += padStr + path + "[" + std::to_string(i) + "]" + v[i]._toString(pads + 1, "[" + std::to_string(i) + "]");
+            result += padStr + path + "[" + std::to_string(i) + "]" + v[i]._toString(pads + 1, path + "[" + std::to_string(i) + "]");
         }
 
         return result;
