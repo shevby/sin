@@ -201,7 +201,16 @@ public:
 
         auto padStr = getPadStr(pads);
 
-        return ": " + s._type + "\n" + padStr + strValue + "\n";
+        std::string result;
+
+        if(s._type == "Double" || s._type == "Int32") {
+            result = ": " + strValue + "\n";
+        }
+        else {
+            result = ": " + s._type + "\n" + padStr + strValue + "\n";
+        }
+
+        return result;
     }
 
     static std::string stringToString(const Sin & s) {
@@ -245,10 +254,9 @@ int testSin() {
     using namespace std;
     Sin a;
 
-    a["first"]["third one"] = 5;
     a["first"]["second one"] = {1,2,3,4};
-    a["first"]["third one"]["another"] = "hey";
-    a["first"]["second one"].asArray().push_back("there");
+    a["first"]["third one"]["another"] = 5.5;
+    a["first"]["second one"].asArray().push_back("hi there");
 
     cout << a.toString() << endl;
     
