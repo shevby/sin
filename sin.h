@@ -38,13 +38,13 @@
 
 
 const int PAD_SIZE = 2;
-
+const char PAD_CHAR = ' ';
 
 std::string getPadStr(int pads = 0) {
     std::string padStr = "";
 
     for(int i = 0; i < pads * PAD_SIZE; i++) {
-        padStr += " ";
+        padStr += PAD_CHAR;
     }
 
     return padStr;
@@ -67,10 +67,10 @@ class Sin
         }
 
         if(_type == "Array") {
-            return arrayToString(*this, pads, path);
+            return arrayToString(*this, pads);
         }
 
-        return objectToString(*this, pads, path);
+        return objectToString(*this, pads);
     }
 
 public:
@@ -208,21 +208,23 @@ public:
         return ": `" + s.asString() + "`\n";
     }
 
-    std::string arrayToString(Sin & s, int pads = 0, std::string path = "") {
-        std::string result = ": Array\n";
+    std::string arrayToString(Sin & s, int pads = 0) {
+        std::string result = ": [\n";
         auto v = s.asArray();
 
         auto padStr = getPadStr(pads + 1);
         
         for(int i = 0; i < v.size(); i++) {
-            result += padStr + path + "[" + std::to_string(i) + "]" + v[i]._toString(pads + 1, path + "[" + std::to_string(i) + "]");
+            result += padStr + "[" + std::to_string(i) + "]" + v[i]._toString(pads + 1, "[" + std::to_string(i) + "]");
         }
+
+        result += padStr.substr(0, pads * PAD_SIZE) + "]\n";
 
         return result;
     }
 
     std::string objectToString(Sin & s, int pads = 0, std::string path = "") {
-        std::string result = ": Object\n";
+        std::string result = ": {\n";
         auto object = s.asObject();
 
         auto padStr = getPadStr(pads + 1);
@@ -232,6 +234,7 @@ public:
             result += padStr + newPath + el.second._toString(pads + 1, newPath);
         }
 
+        result += padStr.substr(0, pads * PAD_SIZE) + "}\n";
         return result;
     }
 
