@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-#include <unordered_map>
+#include <map>
 #include <memory>
 #include <iostream>
 #include <initializer_list>
@@ -31,7 +31,7 @@
         if(_type != #SIN_TYPE) {\
             std::cout << "\nType assertion. Requested type: " #SIN_TYPE ", Actual type: " + _type << std::endl << std::endl;\
             std::cout << "StackTrace:\n" << boost::stacktrace::stacktrace() << std::endl;\
-            throw "Type assertion. Requested type: " #SIN_TYPE ", Actual type: " + _type;\ 
+            throw "Type assertion. Requested type: " #SIN_TYPE ", Actual type: " + _type;\
         }\
         return dynamic_cast<SIN_TYPE*>(_value.get())->value;\
     }
@@ -117,7 +117,7 @@ public:
         return dynamic_cast<Array*>(_value.get())->value;
     }
 
-    std::unordered_map<std::string, Sin> & asObject() {
+    std::map<std::string, Sin> & asObject() {
         if(_type != "Object") {
             std::cout << "Type assertion. Requested type: Object, Actual type: " + _type << std::endl << std::endl;
             std::cout << "StackTrace:\n" << boost::stacktrace::stacktrace() << std::endl;

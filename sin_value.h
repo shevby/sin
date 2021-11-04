@@ -1,6 +1,6 @@
 #pragma once
 
-#include <unordered_map>
+#include <map>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -40,7 +40,7 @@ struct Array : SinValue {
 };
 
 struct Object : SinValue {
-    std::unordered_map<std::string, Sin> value;
+    std::map<std::string, Sin> value;
 };
 
 struct Undefined : SinValue {
