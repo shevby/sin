@@ -16,7 +16,7 @@
 #include "sin_value.h"
 #include "switch.h"
 
-#define SIN_STANDARD_TYPE_SETTER(SIN_TYPE, STANDARD_TYPE)\
+#define SIN_STANDARD_TYPE_SETTER_GETTER(SIN_TYPE, STANDARD_TYPE)\
     Sin(const STANDARD_TYPE & value) {\
         _type = #SIN_TYPE;\
         _value = std::make_shared<SIN_TYPE>(value);\
@@ -24,14 +24,12 @@
     void operator=(STANDARD_TYPE & value){\
         _type = #SIN_TYPE;\
         _value = std::make_shared<SIN_TYPE>(value);\
-    }
-
-#define SIN_STANDARD_TYPE_GETTER(SIN_TYPE, STANDARD_TYPE)\
+    }\
     STANDARD_TYPE as ## SIN_TYPE() const {\
         if(_type != #SIN_TYPE) {\
             std::cout << "\nType assertion. Requested type: " #SIN_TYPE ", Actual type: " + _type << std::endl << std::endl;\
             std::cout << "StackTrace:\n" << boost::stacktrace::stacktrace() << std::endl;\
-            throw "Type assertion. Requested type: " #SIN_TYPE ", Actual type: " + _type;\ 
+            throw "Type assertion. Requested type: " #SIN_TYPE ", Actual type: " + _type;\
         }\
         return dynamic_cast<SIN_TYPE*>(_value.get())->value;\
     }
@@ -84,29 +82,19 @@ public:
         return _type;
     }
 
-    SIN_STANDARD_TYPE_SETTER(Uint8, uint8_t);
-    SIN_STANDARD_TYPE_SETTER(Int8, int8_t);
-    SIN_STANDARD_TYPE_SETTER(Uint16, uint16_t);
-    SIN_STANDARD_TYPE_SETTER(Int16, int16_t);
-    SIN_STANDARD_TYPE_SETTER(Uint32, uint32_t);
-    SIN_STANDARD_TYPE_SETTER(Int32, int32_t);
-    SIN_STANDARD_TYPE_SETTER(Uint64, uint64_t);
-    SIN_STANDARD_TYPE_SETTER(Int64, int64_t);
-    SIN_STANDARD_TYPE_SETTER(Float, float);
-    SIN_STANDARD_TYPE_SETTER(Double, double);
-    SIN_STANDARD_TYPE_SETTER(String, std::string);
-
-    SIN_STANDARD_TYPE_GETTER(Uint8, uint8_t);
-    SIN_STANDARD_TYPE_GETTER(Int8, int8_t);
-    SIN_STANDARD_TYPE_GETTER(Uint16, uint16_t);
-    SIN_STANDARD_TYPE_GETTER(Int16, int16_t);
-    SIN_STANDARD_TYPE_GETTER(Uint32, uint32_t);
-    SIN_STANDARD_TYPE_GETTER(Int32, int32_t);
-    SIN_STANDARD_TYPE_GETTER(Uint64, uint64_t);
-    SIN_STANDARD_TYPE_GETTER(Int64, int64_t);
-    SIN_STANDARD_TYPE_GETTER(Float, float);
-    SIN_STANDARD_TYPE_GETTER(Double, double);
-    SIN_STANDARD_TYPE_GETTER(String, std::string);
+    SIN_STANDARD_TYPE_SETTER_GETTER(Uint8, uint8_t);
+    SIN_STANDARD_TYPE_SETTER_GETTER(Int8, int8_t);
+    SIN_STANDARD_TYPE_SETTER_GETTER(Uint16, uint16_t);
+    SIN_STANDARD_TYPE_SETTER_GETTER(Int16, int16_t);
+    SIN_STANDARD_TYPE_SETTER_GETTER(Uint32, uint32_t);
+    SIN_STANDARD_TYPE_SETTER_GETTER(Int32, int32_t);
+    SIN_STANDARD_TYPE_SETTER_GETTER(Uint64, uint64_t);
+    SIN_STANDARD_TYPE_SETTER_GETTER(Int64, int64_t);
+    SIN_STANDARD_TYPE_SETTER_GETTER(Float, float);
+    SIN_STANDARD_TYPE_SETTER_GETTER(Double, double);
+    SIN_STANDARD_TYPE_SETTER_GETTER(Long, long);
+    SIN_STANDARD_TYPE_SETTER_GETTER(Ulong, unsigned long);
+    SIN_STANDARD_TYPE_SETTER_GETTER(String, std::string);
 
     std::vector<Sin> & asArray() {
         if(_type != "Array") {
@@ -153,6 +141,12 @@ public:
                 v->value.push_back(Sin{});
             }
         }
+        else if(asArray().size() - 1 < index) {
+            auto left = index - (asArray().size() - 1);
+            for(int i = 0; i < left; i++) {
+                asArray().push_back(Sin{});
+            }
+        }
 
         return dynamic_cast<Array*>(_value.get())->value[index];
     }
@@ -196,6 +190,8 @@ public:
         NUMBER_CASE(Uint64)
         NUMBER_CASE(Int64)
         NUMBER_CASE(Float)
+        NUMBER_CASE(Long)
+        NUMBER_CASE(Ulong)
         NUMBER_CASE(Double)
         .exec();
 
@@ -214,7 +210,33 @@ public:
     }
 
     static std::string stringToString(const Sin & s) {
-        return ": `" + s.asString() + "`\n";
+        std::string input = s.asString();
+        std::string result;
+        result.reserve(static_cast<size_t>(input.size() * 1.6));
+
+        for(int i = 0; i < input.size(); i++) {
+            switch(input[i]) {
+                case '\t':
+                result += "\\t";
+                break;
+                case '\n':
+                result += "\\n";
+                break;
+                case '\r':
+                result += "\\r";
+                break;
+                case '"':
+                result += "\\\"";
+                break;
+                case '\\': 
+                result += "\\\\";
+                break;
+                default:
+                result += input[i];
+            }
+        }
+
+        return ": \"" + result + "\"\n";
     }
 
     std::string arrayToString(Sin & s, int pads = 0) {
@@ -253,11 +275,11 @@ public:
 int testSin() {
     using namespace std;
     Sin a;
-
-    a["first"]["second one"] = {1,2,3,4};
-    a["first"]["third one"]["another"] = 5.5;
-    a["first"]["second one"].asArray().push_back("hi there");
-
+    a["a"] = "string \n\t\r\\\"'";
+    a["b"]["id with spaces, long"] = 50000000000;
+    a["c"][0] = 1;
+    a["c"][1] = "str";
+    a["c"][5] = "resize";
     cout << a.toString() << endl;
     
 
