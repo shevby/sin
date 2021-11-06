@@ -209,8 +209,7 @@ public:
         return result;
     }
 
-    static std::string stringToString(const Sin & s) {
-        std::string input = s.asString();
+    static std::string escapeString(std::string input) {
         std::string result;
         result.reserve(static_cast<size_t>(input.size() * 1.6));
 
@@ -236,7 +235,13 @@ public:
             }
         }
 
-        return ": \"" + result + "\"\n";
+        return result;
+    }
+
+    static std::string stringToString(const Sin & s) {
+        std::string input = s.asString();
+        
+        return ": \"" + escapeString(input) + "\"\n";
     }
 
     std::string arrayToString(Sin & s, int pads = 0) {
@@ -261,7 +266,7 @@ public:
         auto padStr = getPadStr(pads + 1);
         
         for(auto el : object) {
-            auto newPath = path + (el.first.find(' ') == std::string::npos ? ("." + el.first) : ("[" + el.first + "]"));
+            auto newPath = path + (el.first.find(' ') == std::string::npos ? ("." + el.first) : ("[\"" + escapeString(el.first) + "\"]"));
             result += padStr + newPath + el.second._toString(pads + 1, newPath);
         }
 
