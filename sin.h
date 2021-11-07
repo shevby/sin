@@ -95,6 +95,7 @@ public:
     SIN_STANDARD_TYPE_SETTER_GETTER(Long, long);
     SIN_STANDARD_TYPE_SETTER_GETTER(Ulong, unsigned long);
     SIN_STANDARD_TYPE_SETTER_GETTER(String, std::string);
+    SIN_STANDARD_TYPE_SETTER_GETTER(Bool, bool);
 
     std::vector<Sin> & asArray() {
         if(_type != "Array") {
@@ -193,13 +194,16 @@ public:
         NUMBER_CASE(Long)
         NUMBER_CASE(Ulong)
         NUMBER_CASE(Double)
+        .Case("Bool", [&]()->void{
+            strValue = s.asBool() ? "true" : "false";
+        })
         .exec();
 
         auto padStr = getPadStr(pads);
 
         std::string result;
 
-        if(s._type == "Double" || s._type == "Int32") {
+        if(s._type == "Double" || s._type == "Int32" || s._type == "Bool") {
             result = ": " + strValue + "\n";
         }
         else {
@@ -285,6 +289,10 @@ int testSin() {
     a["c"][0] = 1;
     a["c"][1] = "str";
     a["c"][5] = "resize";
+    a["d"] = true;
+
+        
+
     cout << a.toString() << endl;
     
 
