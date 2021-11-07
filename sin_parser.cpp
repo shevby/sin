@@ -183,35 +183,65 @@ Sin SinParser::read_sin_value() {
     }
     else if (ch == '{') {
         get_char();
-        skip_whitespace();
         Sin sin;
         while (true) {
+            skip_whitespace();
             int ch2 = ss.peek();
             if (ch2 == EOF) {
                 error += "\nEOF at line " + std::to_string(line_number);
                 return sin;
             }
-            else if (char_is_alpha(ch2) || (ch2 == '[')) {
+            else if ((ch2 == '.') || (ch2 == '[')) {
                 auto name = read_var_name();
                 skip_whitespace();
                 Sin value = read_sin_value();
                 sin[name] = value;
             }
             else if (ch2 == '}') {
+                get_char(); // }
                 return sin;
-            }
-            else if (ch2 == '.') {
-                auto name = read_var_name();
-                skip_whitespace();
-                auto var  = read_sin_value();
-                skip_whitespace();
-                sin[name] = var;
             }
             else {
                 error += std::string("\nUnexpected characted '") + (char)ch2 + "' encountered at line " + std::to_string(line_number);
                 return sin;
             }
+        }
+    }
+    else if (ch == '[') {
+        get_char();
+        Sin sin = {Sin()};
+        while (true) {
             skip_whitespace();
+            int ch2 = ss.peek();
+            if (ch2 == EOF) {
+                error += "\nEOF at line " + std::to_string(line_number);
+                return sin;
+            }
+            else if ((ch2 == '.') || (ch2 == '[')) {
+                auto name = read_var_name();
+                int index;
+                try {
+                    index = std::stoi(name);
+                    if (index < 0) {
+                        throw new std::invalid_argument("Index < 0");
+                    }
+                }
+                catch (std::invalid_argument &e) {
+                    error += std::string("\n") + e.what() + ". Invalid array index: '" + name + "' at line " + std::to_string(line_number); \
+                    return {};
+                }
+                skip_whitespace();
+                Sin value = read_sin_value();
+                sin[index] = value;
+            }
+            else if (ch2 == ']') {
+                get_char(); // ]
+                return sin;
+            }
+            else {
+                error += std::string("\nUnexpected characted '") + (char)ch2 + "' encountered at line " + std::to_string(line_number);
+                return sin;
+            }
         }
         return sin;
     }
@@ -270,4 +300,41 @@ int main() {
     str_assert(sp4.value["first"].type(), "Object", "Test 5");
     str_assert(std::to_string(sp5.value["first"]["second one"]["third one"].asInt16()), "12345", "Test 5");
     str_assert(std::to_string(sp5.value["first"]["second one"]["fourth one"].asInt8()), "0", "Test 5");
+
+    std::string str6 = " :[\n"
+                       "  [0]: Int32\n"
+                       "  1\n"
+                       "  [1]: Int32\n"
+                       "  2\n"
+                       "  [2]: Int32\n"
+                       "  3\n"
+                       "  [3]: Int32\n"
+                       "  4\n"
+                       "]";
+    SinParser sp6(str6);
+    str_assert(sp6.error, "", "Test 6");
+    str_assert(sp6.value.type(), "Array", "Test 6");
+    str_assert(std::to_string(sp6.value[2].asInt32()), "3", "Test 6");
+
+    SinParser sp7(":[]");
+    str_assert(sp7.error, "", "Test 7");
+    str_assert(sp7.value.type(), "Array", "Test 7");
+
+    SinParser sp8(" :\n"
+                  "[\n"
+                  "  [1] : {\n"
+                  "      [one]: {\n"
+                  "         .a : Int8 3 \n"
+                  "         .b : [\n"
+                  "           [1] : Int16 2\n"
+                  "           [4] : Int32 7\n"
+                  "         ]\n"
+                  "      }\n"
+                  "  }\n"
+                  "  [3]: Int8 4\n"
+                  "]");
+    str_assert(sp8.error, "", "Test 8");
+    str_assert(std::to_string(sp8.value[1]["one"]["a"].asInt8()), "3", "Test 8");
+    str_assert(std::to_string(sp8.value[1]["one"]["b"][4].asInt32()), "7", "Test 8");
+    str_assert(std::to_string(sp8.value[3].asInt8()), "4", "Test 8");
 }
