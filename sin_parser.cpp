@@ -63,9 +63,9 @@ void SinParser::skip_whitespace() {
 
 std::string SinParser::read_till_char(const std::set<char> &chars) {
     std::string res;
-    while (!ss.eof()) {
-        char ch = ss.peek();
-        if (chars.contains(ch)) {
+    while (true) {
+        int ch = ss.peek();
+        if (chars.contains(ch) || (ch == EOF)) {
             break;
         }
         else {
@@ -156,11 +156,24 @@ Sin SinParser::read_sin_value() {
     }
     else if (char_is_alpha(ch)) {
         std::string sin_type = read_var_type();
+        if (sin_type == "false") {
+            return false;
+        }
+        if (sin_type == "true") {
+            return true;
+        }
         skip_whitespace();
         std::string sin_value = read_number();
 
-        if (false) {
-            // dummy clause to use following macro
+        if (sin_type == "Bool") {
+            if (sin_value == "false") {
+                return false;
+            }
+            if (sin_value == "true") {
+                return true;
+            }
+            error += "\nInvalid boolean value: " + sin_value + " at line " + std::to_string(line_number);
+            return {};
         }
 #define PARSE_SMALL_INT(SIN_TYPE, STANDARD_TYPE)            \
         else if (sin_type == #SIN_TYPE) {                   \
@@ -337,4 +350,12 @@ int main() {
     str_assert(std::to_string(sp8.value[1]["one"]["a"].asInt8()), "3", "Test 8");
     str_assert(std::to_string(sp8.value[1]["one"]["b"][4].asInt32()), "7", "Test 8");
     str_assert(std::to_string(sp8.value[3].asInt8()), "4", "Test 8");
+
+    SinParser sp9(":false");
+    str_assert(sp9.error, "", "Test 9");
+    str_assert(std::to_string(sp9.value.asBool()), "0", "Test 9");
+
+    SinParser sp10(":Bool true");
+    str_assert(sp10.error, "", "Test 10");
+    str_assert(std::to_string(sp10.value.asBool()), "1", "Test 10");
 }
