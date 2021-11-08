@@ -154,7 +154,7 @@ Sin SinParser::read_sin_value() {
         error += "\nStrings not implemented yet";
         return {};
     }
-    else if (char_is_alpha(ch)) {
+    else if (char_is_alpha(ch) || (ch == '-') || (ch == '+')) {
         std::string sin_type = read_var_type();
         if (sin_type == "false") {
             return false;
@@ -162,6 +162,34 @@ Sin SinParser::read_sin_value() {
         if (sin_type == "true") {
             return true;
         }
+        if (sin_type == "") {
+            error += "\ntype is empty at line " + std::to_string(line_number);
+            return {};
+        }
+
+        // if it looks like a number
+        // try to parse as integer, then as double
+        static std::set<char> first_char_of_number = {'-', '+', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        if (first_char_of_number.contains(sin_type[0])) {
+            try {
+                size_t end_of_int;
+                int64_t value = std::stoll(sin_type, &end_of_int);
+                if (end_of_int != sin_type.size()) {
+                    throw std::invalid_argument("Extra characters");
+                }
+                return value;
+            }
+            catch (std::invalid_argument &e1) {
+                try {
+                    return std::stod(sin_type);
+                }
+                catch (std::invalid_argument &e2) {
+                    error +="\nCannot parse number: '" + sin_type + "' at line " + std::to_string(line_number);
+                    return {};
+                }
+            }
+        }
+
         skip_whitespace();
         std::string sin_value = read_number();
 
@@ -175,20 +203,29 @@ Sin SinParser::read_sin_value() {
             error += "\nInvalid boolean value: " + sin_value + " at line " + std::to_string(line_number);
             return {};
         }
-#define PARSE_SMALL_INT(SIN_TYPE, STANDARD_TYPE)            \
-        else if (sin_type == #SIN_TYPE) {                   \
-            try {                                           \
-                STANDARD_TYPE value = std::stoi(sin_value); \
-                return value;                               \
-            }                                               \
-            catch (std::invalid_argument &e) {              \
+#define PARSE_NUMBER(SIN_TYPE, STANDARD_TYPE, CONVERTER)                                                                            \
+        else if (sin_type == #SIN_TYPE) {                                                                                           \
+            try {                                                                                                                   \
+                STANDARD_TYPE value = std::CONVERTER(sin_value);                                                                    \
+                return value;                                                                                                       \
+            }                                                                                                                       \
+            catch (std::invalid_argument &e) {                                                                                      \
                 error += std::string("\n") + e.what() + ". Can't parse '" + sin_value + "' at line " + std::to_string(line_number); \
-                return {};                                  \
-            }                                               \
+                return {};                                                                                                          \
+            }                                                                                                                       \
         }
-        PARSE_SMALL_INT(Int8,  int8_t)
-        PARSE_SMALL_INT(Int16, int16_t)
-        PARSE_SMALL_INT(Int32, int32_t)
+        PARSE_NUMBER(Int8,  int8_t,  stoll)
+        PARSE_NUMBER(Int16, int16_t, stoll)
+        PARSE_NUMBER(Int32, int32_t, stoll)
+        PARSE_NUMBER(Int64, int64_t, stoll)
+
+        PARSE_NUMBER(Uint8,  int8_t,  stoull)
+        PARSE_NUMBER(Uint16, int16_t, stoull)
+        PARSE_NUMBER(Uint32, int32_t, stoull)
+        PARSE_NUMBER(Uint64, int64_t, stoull)
+
+        PARSE_NUMBER(Double, double, stod)
+
         else {
             error += "\nUnsupported type: " + sin_type + " at line " + std::to_string(line_number);
             return {};
@@ -240,7 +277,7 @@ Sin SinParser::read_sin_value() {
                     }
                 }
                 catch (std::invalid_argument &e) {
-                    error += std::string("\n") + e.what() + ". Invalid array index: '" + name + "' at line " + std::to_string(line_number); \
+                    error += std::string("\n") + e.what() + ". Invalid array index: '" + name + "' at line " + std::to_string(line_number);
                     return {};
                 }
                 skip_whitespace();
@@ -358,4 +395,24 @@ int main() {
     SinParser sp10(":Bool true");
     str_assert(sp10.error, "", "Test 10");
     str_assert(std::to_string(sp10.value.asBool()), "1", "Test 10");
+
+    SinParser sp11(":{\n"
+                   ".bool1: Bool false\n"
+                   ".number: Double 1.23e+5\n"
+                   ".bool2: true\n"
+                   "}");
+    str_assert(sp11.error, "", "Test 11");
+    str_assert(std::to_string(sp11.value["bool1"].asBool()), "0", "Test 11");
+    str_assert(std::to_string(sp11.value["bool2"].asBool()), "1", "Test 11");
+    str_assert(std::to_string((int)sp11.value["number"].asDouble()), "123000", "Test 11");
+
+    SinParser sp12(":-7467839     ");
+    str_assert(sp12.error, "", "Test 12");
+    str_assert(sp12.value.type(), "Int64", "Test 12");
+    str_assert(std::to_string(sp12.value.asInt64()), "-7467839", "Test 12");
+
+    SinParser sp13(":-7467839e+2     ");
+    str_assert(sp13.error, "", "Test 13");
+    str_assert(sp13.value.type(), "Double", "Test 13");
+    str_assert(std::to_string((int64_t)sp13.value.asDouble()), "-746783900", "Test 13");
 }

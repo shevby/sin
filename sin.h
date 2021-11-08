@@ -92,8 +92,6 @@ public:
     SIN_STANDARD_TYPE_SETTER_GETTER(Int64, int64_t);
     SIN_STANDARD_TYPE_SETTER_GETTER(Float, float);
     SIN_STANDARD_TYPE_SETTER_GETTER(Double, double);
-    SIN_STANDARD_TYPE_SETTER_GETTER(Long, long);
-    SIN_STANDARD_TYPE_SETTER_GETTER(Ulong, unsigned long);
     SIN_STANDARD_TYPE_SETTER_GETTER(String, std::string);
     SIN_STANDARD_TYPE_SETTER_GETTER(Bool, bool);
 
@@ -191,8 +189,6 @@ public:
         NUMBER_CASE(Uint64)
         NUMBER_CASE(Int64)
         NUMBER_CASE(Float)
-        NUMBER_CASE(Long)
-        NUMBER_CASE(Ulong)
         NUMBER_CASE(Double)
         .Case("Bool", [&]()->void{
             strValue = s.asBool() ? "true" : "false";
