@@ -27,6 +27,7 @@ private:
     void skip_chars(const std::set<char> &chars);
     void skip_whitespace();
     std::string read_till_char(const std::set<char> &chars);
+    std::string read_till_char_with_escape(const std::set<char> &terminating_chars, const std::map<char, std::string> &escapes);
     std::string read_number();
 
     Sin read_sin_value();
@@ -71,6 +72,31 @@ std::string SinParser::read_till_char(const std::set<char> &chars) {
         else {
             res += ch;
             get_char();
+        }
+    }
+    return res;
+}
+
+std::string SinParser::read_till_char_with_escape(const std::set<char> &terminating_chars, const std::map<char, std::string> &escapes) {
+    std::string res;
+    while (true) {
+        int ch = ss.peek();
+        if (terminating_chars.contains(ch) || (ch == EOF)) {
+            break;
+        }
+        else {
+            get_char();
+            if (ch == '\\') {
+                ch = get_char();
+                if (ch == EOF) {
+                    error += "\nUnexpected EOF after backslash at line " + std::to_string(line_number);
+                    return res;
+                }
+                res += escapes.contains(ch) ? escapes.at(ch) : "\\" + std::string(1, ch);
+            }
+            else {
+                res += ch;
+            }
         }
     }
     return res;
@@ -150,9 +176,16 @@ Sin SinParser::read_sin_value() {
         return {};
     }
     else if (ch == '\"') {
-        // TODO : read string
-        error += "\nStrings not implemented yet";
-        return {};
+        get_char(); // opening "
+        std::string value = read_till_char_with_escape({'"'}, {{'n', "\n"}, {'"', "\""}, {'r', "\r"}, {'t', "\t"}, {'\\', "\\"}});
+        get_char(); // closing "
+        return value;
+    }
+    else if (ch == '`') {
+        get_char(); // opening `
+        std::string value = read_till_char_with_escape({'`'}, {{'`', "`"}, {'\\', "\\"}});
+        get_char(); // closing `
+        return value;
     }
     else if (char_is_alpha(ch) || (ch == '-') || (ch == '+')) {
         std::string sin_type = read_var_type();
@@ -415,4 +448,34 @@ int main() {
     str_assert(sp13.error, "", "Test 13");
     str_assert(sp13.value.type(), "Double", "Test 13");
     str_assert(std::to_string((int64_t)sp13.value.asDouble()), "-746783900", "Test 13");
+
+    SinParser sp14(": \"simple string\"     ");
+    str_assert(sp14.error, "", "Test 14");
+    str_assert(sp14.value.type(), "String", "Test 14");
+    str_assert(sp14.value.asString(), "simple string", "Test 14");
+
+    SinParser sp15(": `simple string`     ");
+    str_assert(sp15.error, "", "Test 15");
+    str_assert(sp15.value.type(), "String", "Test 15");
+    str_assert(sp15.value.asString(), "simple string", "Test 15");
+
+    SinParser sp16(": \"\\nstring\twith\\\\escaped\\\"symbols\"");
+    str_assert(sp16.error, "", "Test 16");
+    str_assert(sp16.value.type(), "String", "Test 16");
+    str_assert(sp16.value.asString(), "\nstring\twith\\escaped\"symbols", "Test 16");
+
+    SinParser sp17(": `\\nstring\\twith\\\\escaped\\`symbols`");
+    str_assert(sp17.error, "", "Test 17");
+    str_assert(sp17.value.type(), "String", "Test 17");
+    str_assert(sp17.value.asString(), "\\nstring\\twith\\escaped`symbols", "Test 17");
+
+    SinParser sp18(": [\n"
+                   "    [20]: \"123\"\n"
+                   "    [3] : \"456\"\n"
+                   "    [0] : \"789\"\n"
+                   "]");
+    str_assert(sp18.error, "", "Test 18");
+    str_assert(sp18.value[20].asString(), "123", "Test 18");
+    str_assert(sp18.value[3].asString(), "456", "Test 18");
+    str_assert(sp18.value[0].asString(), "789", "Test 18");
 }
