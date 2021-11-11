@@ -33,6 +33,7 @@ private:
     Sin read_sin_value();
     std::string read_var_name();
     std::string read_var_type();
+    std::string read_string();
 };
 
 int SinParser::get_char() {
@@ -121,8 +122,20 @@ std::string SinParser::read_var_name() {
     int ch = ss.peek();
     if (ch == '[') {
         get_char(); // [
-        auto res = read_till_char({']'});
-        get_char(); // ]
+        skip_whitespace();
+        std::string res;
+        ch = ss.peek();
+        if ((ch == '`') || (ch == '"')) {
+            res = read_string();
+            skip_whitespace();
+        }
+        else {
+            res = read_till_char({']'});
+        }
+        ch = get_char();
+        if (ch != ']') {
+            error += "\n']' expected but " + (ch == EOF ? "EOF" : "'" + std::string(1, ch) + "'") + " found at line " + std::to_string(line_number);
+        }
         return res;
     }
     else if (ch == '.') {
@@ -152,6 +165,30 @@ std::string SinParser::read_number() {
     return read_till_char(delimiters);
 }
 
+std::string SinParser::read_string() {
+    int ch = get_char();
+    if (ch == '\"') {
+        std::string value = read_till_char_with_escape({'"'}, {{'n', "\n"}, {'"', "\""}, {'r', "\r"}, {'t', "\t"}, {'\\', "\\"}});
+        get_char(); // closing "
+        return value;
+    }
+    else if (ch == '`') {
+        std::string value = read_till_char_with_escape({'`'}, {{'`', "`"}, {'\\', "\\"}});
+        if (value.size() && value[0] == '\n') {
+            value.erase(value.begin());
+        }
+        if (value.size() && *value.rbegin() == '\n') {
+            value.pop_back();
+        }
+        get_char(); // closing `
+        return value;
+    }
+    else {
+        error += "\ncharacter " + (ch == EOF ? "EOF" : "'" + std::string(1, ch) + "'") + " is not a valid quote at line " + std::to_string(line_number);
+        return {};
+    }
+}
+
 Sin SinParser::read_sin_value() {
     skip_whitespace();
     if (ss.eof()) {
@@ -175,17 +212,8 @@ Sin SinParser::read_sin_value() {
         error += "\nUnexpected EOF encountered at line " + std::to_string(line_number);
         return {};
     }
-    else if (ch == '\"') {
-        get_char(); // opening "
-        std::string value = read_till_char_with_escape({'"'}, {{'n', "\n"}, {'"', "\""}, {'r', "\r"}, {'t', "\t"}, {'\\', "\\"}});
-        get_char(); // closing "
-        return value;
-    }
-    else if (ch == '`') {
-        get_char(); // opening `
-        std::string value = read_till_char_with_escape({'`'}, {{'`', "`"}, {'\\', "\\"}});
-        get_char(); // closing `
-        return value;
+    else if ((ch == '\"') || (ch == '`')) {
+        return read_string();
     }
     else if (char_is_alpha(ch) || (ch == '-') || (ch == '+')) {
         std::string sin_type = read_var_type();
@@ -478,4 +506,26 @@ int main() {
     str_assert(sp18.value[20].asString(), "123", "Test 18");
     str_assert(sp18.value[3].asString(), "456", "Test 18");
     str_assert(sp18.value[0].asString(), "789", "Test 18");
+
+    SinParser sp19(": {\n"
+                   " [ \" var 1 \" ] : -3\n"
+                   "[\"var 2\"]: true   \n"
+                   "   [ \"var \\\" 3\" ] : \"abc\"\n"
+                   "}\n");
+    str_assert(sp19.error, "", "Test 19");
+    str_assert(std::to_string(sp19.value[" var 1 "].asInt64()), "-3", "Test 19");
+    str_assert(std::to_string(sp19.value["var 2"].asBool()), "1", "Test 19");
+    str_assert(sp19.value["var \" 3"].asString(), "abc", "Test 19");
+
+    SinParser sp20(": `\n"
+                   "abc\n"
+                   "c\\\\d\n"
+                   "ef\\`gh\n"
+                   "`");
+    str_assert(sp20.error, "", "Test 20");
+    str_assert(sp20.value.asString(), "abc\nc\\d\nef`gh", "Test 20");
+
+    SinParser sp21(": `ab\\`c`\n");
+    str_assert(sp21.error, "", "Test 21");
+    str_assert(sp21.value.asString(), "ab`c", "Test 21");
 }
