@@ -174,6 +174,12 @@ std::string SinParser::read_string() {
     }
     else if (ch == '`') {
         std::string value = read_till_char_with_escape({'`'}, {{'`', "`"}, {'\\', "\\"}});
+        if (value.size() && value[0] == '\n') {
+            value.erase(value.begin());
+        }
+        if (value.size() && *value.rbegin() == '\n') {
+            value.pop_back();
+        }
         get_char(); // closing `
         return value;
     }
@@ -510,4 +516,16 @@ int main() {
     str_assert(std::to_string(sp19.value[" var 1 "].asInt64()), "-3", "Test 19");
     str_assert(std::to_string(sp19.value["var 2"].asBool()), "1", "Test 19");
     str_assert(sp19.value["var \" 3"].asString(), "abc", "Test 19");
+
+    SinParser sp20(": `\n"
+                   "abc\n"
+                   "c\\\\d\n"
+                   "ef\\`gh\n"
+                   "`");
+    str_assert(sp20.error, "", "Test 20");
+    str_assert(sp20.value.asString(), "abc\nc\\d\nef`gh", "Test 20");
+
+    SinParser sp21(": `ab\\`c`\n");
+    str_assert(sp21.error, "", "Test 21");
+    str_assert(sp21.value.asString(), "ab`c", "Test 21");
 }
