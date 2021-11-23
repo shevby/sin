@@ -113,6 +113,10 @@ static bool char_is_alpha(char ch) {
     return false;
 }
 
+static bool char_is_num(char ch) {
+    return (ch >= '0') && (ch <= '9');
+}
+
 std::string SinParser::read_var_name() {
     skip_whitespace();
     if (ss.eof()) {
@@ -215,7 +219,7 @@ Sin SinParser::read_sin_value() {
     else if ((ch == '\"') || (ch == '`')) {
         return read_string();
     }
-    else if (char_is_alpha(ch) || (ch == '-') || (ch == '+')) {
+    else if (char_is_alpha(ch) || char_is_num(ch) || (ch == '-') || (ch == '+')) {
         std::string sin_type = read_var_type();
         if (sin_type == "false") {
             return false;
@@ -242,7 +246,12 @@ Sin SinParser::read_sin_value() {
             }
             catch (std::invalid_argument &e1) {
                 try {
-                    return std::stod(sin_type);
+                    size_t end_of_var;
+                    double value = std::stod(sin_type, &end_of_var);
+                    if (end_of_var != sin_type.size()) {
+                        throw std::invalid_argument("Extra characters");
+                    }
+                    return value;
                 }
                 catch (std::invalid_argument &e2) {
                     error +="\nCannot parse number: '" + sin_type + "' at line " + std::to_string(line_number);
@@ -330,9 +339,13 @@ Sin SinParser::read_sin_value() {
             }
             else if ((ch2 == '.') || (ch2 == '[')) {
                 auto name = read_var_name();
-                int index;
+                int32_t index;
                 try {
-                    index = std::stoi(name);
+                    size_t end_of_int;
+                    index = std::stoi(name, &end_of_int);
+                    if (end_of_int != name.size()) {
+                        throw std::invalid_argument("Extra characters");
+                    }
                     if (index < 0) {
                         throw new std::invalid_argument("Index < 0");
                     }
@@ -369,6 +382,12 @@ SinParser::SinParser(const std::string &str): ss(str) {
 static void str_assert(const std::string &real, const std::string &expected, const std::string &descr = "error") {
     if (expected != real) {
         std::cerr << descr << ":\n'" << real << "'\n != \n'" << expected << "'\n";
+    }
+}
+
+static void assert_error_happened(const std::string &error, const std::string &descr = "error") {
+    if (error.empty()) {
+        std::cerr << descr << ": error expected, but not detected\n";
     }
 }
 
@@ -528,4 +547,33 @@ int main() {
     SinParser sp21(": `ab\\`c`\n");
     str_assert(sp21.error, "", "Test 21");
     str_assert(sp21.value.asString(), "ab`c", "Test 21");
+
+    SinParser sp22(": [\n"
+                   "   [0extra_input] : true\n"
+                   "  ]\n");
+    assert_error_happened(sp22.error, "Test 22");
+
+    SinParser sp23(": [\n"
+                   "   [1] : 123\n"
+                   "  ]\n");
+    str_assert(sp23.error, "", "Test 23");
+    str_assert(sp23.value[1].type(), "Int64", "Test 23");
+    str_assert(std::to_string(sp23.value[1].asInt64()), "123", "Test 23");
+
+    SinParser sp24(": [\n"
+                   "   [1] : 123extra_input\n"
+                   "  ]\n");
+    assert_error_happened(sp24.error, "Test 24");
+
+    SinParser sp25(": [\n"
+                   "   [1] : 123.456\n"
+                   "  ]\n");
+    str_assert(sp25.error, "", "Test 25");
+    str_assert(sp25.value[1].type(), "Double", "Test 25");
+    str_assert(std::to_string((int64_t)(10000 * sp25.value[1].asDouble())), "1234560", "Test 25");
+
+    SinParser sp26(": [\n"
+                   "   [1] : 123.456extra\n"
+                   "  ]\n");
+    assert_error_happened(sp26.error, "Test 26");
 }
