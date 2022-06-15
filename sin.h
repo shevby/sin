@@ -276,21 +276,3 @@ public:
 
 };
 
-
-int testSin() {
-    using namespace std;
-    Sin a;
-    a["a"] = "string \n\t\r\\\"'";
-    a["b"]["id with spaces, long"] = 50000000000;
-    a["c"][0] = 1;
-    a["c"][1] = "str";
-    a["c"][5] = "resize";
-    a["d"] = true;
-
-        
-
-    cout << a.toString() << endl;
-    
-
-    return 0;
-}

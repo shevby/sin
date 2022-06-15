@@ -1,0 +1,20 @@
+set(TEST_MAIN test)
+set(TEST_SOURCES main.cpp)
+
+Include(FetchContent)
+
+FetchContent_Declare(
+  Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG v3.0.1 # or a later release
+)
+
+FetchContent_MakeAvailable(Catch2)
+
+add_executable(${TEST_MAIN} ${TEST_SOURCES})
+
+target_link_libraries(
+  ${TEST_MAIN}
+  PRIVATE
+  Catch2::Catch2WithMain
+)
