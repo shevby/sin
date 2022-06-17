@@ -43,26 +43,10 @@ std::string getPadStr(int pads = 0) {
 
 class Sin
 {
-
     std::shared_ptr<SinValue> _value;
     std::string _type;
 
-    std::string _toString(int pads = 0, std::string path = "") {
-        if(_type != "Array" && _type != "Object") {
-
-            if(_type == "String") {
-                return stringToString(*this);
-            }
-
-            return numberToString(*this, pads);
-        }
-
-        if(_type == "Array") {
-            return arrayToString(*this, pads);
-        }
-
-        return objectToString(*this, pads);
-    }
+    std::string _toString(int pads = 0, std::string path = "");
 
 public:
 
