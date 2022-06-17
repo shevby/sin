@@ -41,11 +41,9 @@ class Sin
     std::string _toString(int pads = 0, std::string path = "");
 
 public:
-
-    Sin() {
-        _type = "Object";
-        _value = std::make_shared<Object>();
-    }
+    Sin();
+    Sin(const char * str);
+    Sin(std::initializer_list<Sin> list);
 
     std::string type() {
         return _type;
@@ -79,21 +77,6 @@ public:
         }
         return dynamic_cast<Object*>(_value.get())->value;
     }
-
-    Sin(const char * str) {
-        _type = "String";
-        _value = std::make_shared<String>(std::string(str));
-    }
-
-    Sin(std::initializer_list<Sin> list) {
-        _type = "Array";
-        _value = std::make_shared<Array>();
-
-        for(auto el : list) {
-            dynamic_cast<Array*>(_value.get())->value.push_back(el);
-        }
-    }
-
 
     Sin & operator[](const int index) {
 
