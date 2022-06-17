@@ -15,11 +15,6 @@
     void operator=(STANDARD_TYPE & value);\
     STANDARD_TYPE as ## SIN_TYPE() const;
 
-const int PAD_SIZE = 2;
-const char PAD_CHAR = ' ';
-
-std::string getPadStr(int pads = 0);
-
 class Sin
 {
     std::shared_ptr<SinValue> _value;

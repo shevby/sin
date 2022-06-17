@@ -69,6 +69,19 @@ std::string Sin::toString() {
     return this->_toString();
 }
 
+const int PAD_SIZE = 2;
+const char PAD_CHAR = ' ';
+
+static std::string getPadStr(int pads) {
+    std::string padStr = "";
+
+    for(int i = 0; i < pads * PAD_SIZE; i++) {
+        padStr += PAD_CHAR;
+    }
+
+    return padStr;
+}
+
 std::string Sin::numberToString(const Sin & s, int pads) {
 
 #define NUMBER_CASE(SIN_TYPE)\
@@ -171,14 +184,4 @@ std::string Sin::objectToString(Sin & s, int pads, std::string path) {
 
     result += padStr.substr(0, pads * PAD_SIZE) + "}\n";
     return result;
-}
-
-std::string getPadStr(int pads) {
-    std::string padStr = "";
-
-    for(int i = 0; i < pads * PAD_SIZE; i++) {
-        padStr += PAD_CHAR;
-    }
-
-    return padStr;
 }
