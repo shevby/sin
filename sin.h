@@ -10,23 +10,10 @@
 #include "sin_value.h"
 #include "switch.h"
 
-#define SIN_STANDARD_TYPE_SETTER_GETTER(SIN_TYPE, STANDARD_TYPE)\
-    Sin(const STANDARD_TYPE & value) {\
-        _type = #SIN_TYPE;\
-        _value = std::make_shared<SIN_TYPE>(value);\
-    }\
-    void operator=(STANDARD_TYPE & value){\
-        _type = #SIN_TYPE;\
-        _value = std::make_shared<SIN_TYPE>(value);\
-    }\
-    STANDARD_TYPE as ## SIN_TYPE() const {\
-        if(_type != #SIN_TYPE) {\
-            std::cout << "\nType assertion. Requested type: " #SIN_TYPE ", Actual type: " + _type << std::endl << std::endl;\
-            throw "Type assertion. Requested type: " #SIN_TYPE ", Actual type: " + _type;\
-        }\
-        return dynamic_cast<SIN_TYPE*>(_value.get())->value;\
-    }
-
+#define SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(SIN_TYPE, STANDARD_TYPE)\
+    Sin(const STANDARD_TYPE & value);\
+    void operator=(STANDARD_TYPE & value);\
+    STANDARD_TYPE as ## SIN_TYPE() const;
 
 const int PAD_SIZE = 2;
 const char PAD_CHAR = ' ';
@@ -49,18 +36,18 @@ public:
         return _type;
     }
 
-    SIN_STANDARD_TYPE_SETTER_GETTER(Uint8, uint8_t);
-    SIN_STANDARD_TYPE_SETTER_GETTER(Int8, int8_t);
-    SIN_STANDARD_TYPE_SETTER_GETTER(Uint16, uint16_t);
-    SIN_STANDARD_TYPE_SETTER_GETTER(Int16, int16_t);
-    SIN_STANDARD_TYPE_SETTER_GETTER(Uint32, uint32_t);
-    SIN_STANDARD_TYPE_SETTER_GETTER(Int32, int32_t);
-    SIN_STANDARD_TYPE_SETTER_GETTER(Uint64, uint64_t);
-    SIN_STANDARD_TYPE_SETTER_GETTER(Int64, int64_t);
-    SIN_STANDARD_TYPE_SETTER_GETTER(Float, float);
-    SIN_STANDARD_TYPE_SETTER_GETTER(Double, double);
-    SIN_STANDARD_TYPE_SETTER_GETTER(String, std::string);
-    SIN_STANDARD_TYPE_SETTER_GETTER(Bool, bool);
+    SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(Uint8, uint8_t);
+    SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(Int8, int8_t);
+    SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(Uint16, uint16_t);
+    SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(Int16, int16_t);
+    SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(Uint32, uint32_t);
+    SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(Int32, int32_t);
+    SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(Uint64, uint64_t);
+    SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(Int64, int64_t);
+    SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(Float, float);
+    SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(Double, double);
+    SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(String, std::string);
+    SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(Bool, bool);
 
     std::vector<Sin> & asArray() {
         if(_type != "Array") {
