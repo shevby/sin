@@ -36,7 +36,15 @@ TEST_CASE("Check setters and getters") {
   REQUIRE(a[1].asInt32() == 2);
   REQUIRE(a[2].asString() == "5");
   REQUIRE(a[3][0].asString() == "another array");
-
   
+  a = {};
+
+  a["a"] = 15;
+  a["b"] = 32;
+  a["c"] = true;
+  a["d"] = (uint64_t)5000000000;
+  a["e"] = {1, 2, 50000, 2.5, 6000000000.6};
+
+  REQUIRE(Sin::parse(a.toString()).toString() == a.toString());
   
 }
