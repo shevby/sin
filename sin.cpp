@@ -51,18 +51,18 @@ SIN_STANDARD_TYPE_SETTER_GETTER(Bool, bool);
 
 std::string Sin::_toString(int pads, std::string path) {
     if (_type == "Object") {
-        return objectToString(*this, pads);
+        return objectToString(pads);
     }
 
     if (_type == "Array") {
-        return arrayToString(*this, pads);
+        return arrayToString(pads);
     }
 
     if (_type == "String") {
-        return stringToString(*this);
+        return stringToString();
     }
 
-    return numberToString(*this, pads);
+    return numberToString(pads);
 }
 
 std::string Sin::toString() {
@@ -82,16 +82,16 @@ static std::string getPadStr(int pads) {
     return padStr;
 }
 
-std::string Sin::numberToString(const Sin & s, int pads) {
+std::string Sin::numberToString(int pads) {
 
 #define NUMBER_CASE(SIN_TYPE)\
 .Case(#SIN_TYPE, [&]()->void{\
-strValue = std::to_string(s.as ##SIN_TYPE());\
+strValue = std::to_string(as ##SIN_TYPE());\
 })
 
     std::string strValue;
 
-    Switch<std::string>(s._type)
+    Switch<std::string>(_type)
     NUMBER_CASE(Uint8)
     NUMBER_CASE(Int8)
     NUMBER_CASE(Uint16)
@@ -103,7 +103,7 @@ strValue = std::to_string(s.as ##SIN_TYPE());\
     NUMBER_CASE(Float)
     NUMBER_CASE(Double)
     .Case("Bool", [&]()->void{
-        strValue = s.asBool() ? "true" : "false";
+        strValue = asBool() ? "true" : "false";
     })
     .exec();
 
@@ -111,11 +111,11 @@ strValue = std::to_string(s.as ##SIN_TYPE());\
 
     std::string result;
 
-    if(s._type == "Double" || s._type == "Int32" || s._type == "Bool") {
+    if(_type == "Double" || _type == "Int32" || _type == "Bool") {
         result = ": " + strValue + "\n";
     }
     else {
-        result = ": " + s._type + "\n" + padStr + strValue + "\n";
+        result = ": " + _type + "\n" + padStr + strValue + "\n";
     }
 
     return result;
@@ -150,15 +150,15 @@ static std::string escapeString(std::string input) {
     return result;
 }
 
-std::string Sin::stringToString(const Sin & s) {
-    std::string input = s.asString();
+std::string Sin::stringToString() {
+    std::string input = asString();
 
     return ": \"" + escapeString(input) + "\"\n";
 }
 
-std::string Sin::arrayToString(Sin & s, int pads) {
+std::string Sin::arrayToString(int pads) {
     std::string result = ": [\n";
-    auto v = s.asArray();
+    auto v = asArray();
 
     auto padStr = getPadStr(pads + 1);
 
@@ -171,9 +171,9 @@ std::string Sin::arrayToString(Sin & s, int pads) {
     return result;
 }
 
-std::string Sin::objectToString(Sin & s, int pads, std::string path) {
+std::string Sin::objectToString(int pads, std::string path) {
     std::string result = ": {\n";
-    auto object = s.asObject();
+    auto object = asObject();
 
     auto padStr = getPadStr(pads + 1);
 

@@ -100,9 +100,9 @@ public:
 
     std::string toString();
 
-    static std::string numberToString(const Sin & s, int pads = 0);
-    static std::string stringToString(const Sin & s);
-    std::string arrayToString(Sin & s, int pads = 0);
-    std::string objectToString(Sin & s, int pads = 0, std::string path = "");
+private:
+    std::string numberToString(int pads = 0);
+    std::string stringToString();
+    std::string arrayToString(int pads = 0);
+    std::string objectToString(int pads = 0, std::string path = "");
 };
-
