@@ -49,7 +49,7 @@ SIN_STANDARD_TYPE_SETTER_GETTER(Double, double);
 SIN_STANDARD_TYPE_SETTER_GETTER(String, std::string);
 SIN_STANDARD_TYPE_SETTER_GETTER(Bool, bool);
 
-std::string Sin::_toString(int pads, std::string path) {
+std::string Sin::_toString(int pads) {
     if (_type == "Object") {
         return objectToString(pads);
     }
@@ -163,7 +163,7 @@ std::string Sin::arrayToString(int pads) {
     auto padStr = getPadStr(pads + 1);
 
     for(int i = 0; i < v.size(); i++) {
-        result += padStr + "[" + std::to_string(i) + "]" + v[i]._toString(pads + 1, "[" + std::to_string(i) + "]");
+        result += padStr + "[" + std::to_string(i) + "]" + v[i]._toString(pads + 1);
     }
 
     result += padStr.substr(0, pads * PAD_SIZE) + "]\n";
@@ -171,15 +171,15 @@ std::string Sin::arrayToString(int pads) {
     return result;
 }
 
-std::string Sin::objectToString(int pads, std::string path) {
+std::string Sin::objectToString(int pads) {
     std::string result = ": {\n";
     auto object = asObject();
 
     auto padStr = getPadStr(pads + 1);
 
     for(auto el : object) {
-        auto newPath = path + (el.first.find(' ') == std::string::npos ? ("." + el.first) : ("[\"" + escapeString(el.first) + "\"]"));
-        result += padStr + newPath + el.second._toString(pads + 1, newPath);
+        auto key = (el.first.find(' ') == std::string::npos ? ("." + el.first) : ("[\"" + escapeString(el.first) + "\"]"));
+        result += padStr + key + el.second._toString(pads + 1);
     }
 
     result += padStr.substr(0, pads * PAD_SIZE) + "}\n";

@@ -20,7 +20,7 @@ class Sin
     std::shared_ptr<SinValue> _value;
     std::string _type;
 
-    std::string _toString(int pads = 0, std::string path = "");
+    std::string _toString(int pads = 0);
 
 public:
     Sin();
@@ -104,5 +104,5 @@ private:
     std::string numberToString(int pads = 0);
     std::string stringToString();
     std::string arrayToString(int pads = 0);
-    std::string objectToString(int pads = 0, std::string path = "");
+    std::string objectToString(int pads = 0);
 };
