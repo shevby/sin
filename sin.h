@@ -31,15 +31,7 @@
 const int PAD_SIZE = 2;
 const char PAD_CHAR = ' ';
 
-std::string getPadStr(int pads = 0) {
-    std::string padStr = "";
-
-    for(int i = 0; i < pads * PAD_SIZE; i++) {
-        padStr += PAD_CHAR;
-    }
-
-    return padStr;
-}
+std::string getPadStr(int pads = 0);
 
 class Sin
 {
