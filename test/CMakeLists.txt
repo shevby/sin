@@ -1,5 +1,5 @@
 set(TEST_MAIN test)
-set(TEST_SOURCES main.cpp ../sin.cpp)
+set(TEST_SOURCES main.cpp ../sin.cpp ../sin_parser.cpp)
 
 Include(FetchContent)
 

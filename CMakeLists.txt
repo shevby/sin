@@ -11,6 +11,7 @@ option(BUILD_TEST "Build catch2 tests" ON)
 set(SOURCES
   sin.cpp
   sin_value.cpp
+  sin_parser.cpp
 )
 
 add_library(${LIB_NAME} SHARED ${SOURCES})

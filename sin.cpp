@@ -1,4 +1,5 @@
 #include "sin.h"
+#include "sin_parser.h"
 
 #include <iostream>
 
@@ -19,6 +20,10 @@ Sin::Sin(std::initializer_list<Sin> list) {
     for(auto el : list) {
         dynamic_cast<Array*>(_value.get())->value.push_back(el);
     }
+}
+
+Sin Sin::parse(const std::string &str) {
+    return SinParser(str).value;
 }
 
 #define SIN_STANDARD_TYPE_SETTER_GETTER(SIN_TYPE, STANDARD_TYPE)\

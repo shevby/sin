@@ -26,6 +26,8 @@ public:
     Sin(const char * str);
     Sin(std::initializer_list<Sin> list);
 
+	static Sin parse(const std::string &str);
+
     std::string type();
 
     SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(Uint8, uint8_t);

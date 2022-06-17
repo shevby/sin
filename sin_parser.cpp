@@ -1,40 +1,14 @@
 #include <memory>
-#include <set>
-#include <sstream>
-#include <string>
 #include <vector>
 
 #include <iostream>
 
-#include "sin_value.h"
 #include "sin.h"
+#include "sin_parser.h"
+#include "sin_value.h"
 
-class SinParser {
-public:
-    SinParser(const std::string &str);
-    Sin value;
-    std::string error;
-private:
-    size_t line_number = 0;
-    std::stringstream ss;
-
-    /**
-     * A wrapper around std::stringsteam::get() to implement line counter
-     */
-    int get_char();
-    std::set<char> whitespace =          {' ', '\t', '\n', '\r'};
-    std::set<char> whitespace_or_colon = {' ', '\t', '\n', '\r', ':'};
-    void skip_chars(const std::set<char> &chars);
-    void skip_whitespace();
-    std::string read_till_char(const std::set<char> &chars);
-    std::string read_till_char_with_escape(const std::set<char> &terminating_chars, const std::map<char, std::string> &escapes);
-    std::string read_number();
-
-    Sin read_sin_value();
-    std::string read_var_name();
-    std::string read_var_type();
-    std::string read_string();
-};
+const std::set<char> whitespace =          {' ', '\t', '\n', '\r'};
+const std::set<char> whitespace_or_colon = {' ', '\t', '\n', '\r', ':'};
 
 int SinParser::get_char() {
     if (ss.eof()) {
@@ -392,7 +366,7 @@ static void assert_error_happened(const std::string &error, const std::string &d
 }
 
 // unit tests
-int main() {
+void run_parser_tests() {
     SinParser sp1(":Int32\n1");
     str_assert(sp1.error, "", "Test 1");
     str_assert(sp1.value.type(), "Int32", "Test 1");
