@@ -7,10 +7,6 @@
 #include <iostream>
 #include <initializer_list>
 
-#ifndef _GNU_SOURCE 
-    #define _GNU_SOURCE 
-#endif 
-
 #include "sin_value.h"
 #include "switch.h"
 
