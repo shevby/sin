@@ -8,17 +8,12 @@ set(LIB_NAME sin)
 
 option(BUILD_TEST "Build catch2 tests" ON)
 
-#Find and configure Boost
-find_package(Boost REQUIRED)
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
-
 set(SOURCES
   sin.cpp
   sin_value.cpp
 )
 
 add_library(${LIB_NAME} SHARED ${SOURCES})
-target_link_libraries(${LIB_NAME} PUBLIC ${Boost_LIBRARIES})
 
 include_directories(".")
 

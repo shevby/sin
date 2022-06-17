@@ -11,8 +11,6 @@
     #define _GNU_SOURCE 
 #endif 
 
-#include <boost/stacktrace.hpp>
-
 #include "sin_value.h"
 #include "switch.h"
 
@@ -28,7 +26,6 @@
     STANDARD_TYPE as ## SIN_TYPE() const {\
         if(_type != #SIN_TYPE) {\
             std::cout << "\nType assertion. Requested type: " #SIN_TYPE ", Actual type: " + _type << std::endl << std::endl;\
-            std::cout << "StackTrace:\n" << boost::stacktrace::stacktrace() << std::endl;\
             throw "Type assertion. Requested type: " #SIN_TYPE ", Actual type: " + _type;\
         }\
         return dynamic_cast<SIN_TYPE*>(_value.get())->value;\
@@ -98,7 +95,6 @@ public:
     std::vector<Sin> & asArray() {
         if(_type != "Array") {
             std::cout << "Type assertion. Requested type: Array, Actual type: " + _type << std::endl << std::endl;
-            std::cout << "StackTrace:\n" << boost::stacktrace::stacktrace() << std::endl;
             throw "Type assertion. Requested type: Array, Actual type: " + _type;
         }
         return dynamic_cast<Array*>(_value.get())->value;
@@ -107,7 +103,6 @@ public:
     std::map<std::string, Sin> & asObject() {
         if(_type != "Object") {
             std::cout << "Type assertion. Requested type: Object, Actual type: " + _type << std::endl << std::endl;
-            std::cout << "StackTrace:\n" << boost::stacktrace::stacktrace() << std::endl;
             throw "Type assertion. Requested type: Object, Actual type: " + _type;
         }
         return dynamic_cast<Object*>(_value.get())->value;
