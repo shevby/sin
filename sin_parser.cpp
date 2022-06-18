@@ -386,7 +386,7 @@ Sin SinParser::read_sin_value()
     else if (ch == '[')
     {
         get_char();
-        Sin sin = {Sin()};
+        Sin sin = Sin::Array();
         while (true)
         {
             skip_whitespace();

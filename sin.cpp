@@ -264,7 +264,7 @@ Sin &Sin::operator[](const int index)
             v->value.push_back(Sin{});
         }
     }
-    else if (asArray().size() - 1 < index)
+    else if (int(asArray().size()) - 1 < index)
     {
         auto left = index - (asArray().size() - 1);
         for (int i = 0; i < left; i++)
