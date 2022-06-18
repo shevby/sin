@@ -342,6 +342,7 @@ Sin SinParser::read_sin_value()
         PARSE_NUMBER(Uint32, uint32_t, stoull, true, 0, 0xFFFFFFFFull)
         PARSE_NUMBER(Uint64, uint64_t, stoull, false, 0, 0)
 
+        PARSE_NUMBER(Float, float, stof, false, 0, 0)
         PARSE_NUMBER(Double, double, stod, false, 0, 0)
 
         else
