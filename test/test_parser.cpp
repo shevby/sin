@@ -122,8 +122,8 @@ TEST_CASE("SIN parser") {
     SECTION("12") {
         SinParser sp(":-7467839     ");
         CHECK(sp.error == "");
-        CHECK(sp.value.type() == "Int64");
-        CHECK(sp.value.asInt64() == -7467839);
+        CHECK(sp.value.type() == "Int32");
+        CHECK(sp.value.asInt32() == -7467839);
     }
 
     SECTION("13") {
@@ -180,7 +180,7 @@ TEST_CASE("SIN parser") {
                      "   [ \"var \\\" 3\" ] : \"abc\"\n"
                      "}\n");
         CHECK(sp.error == "");
-        CHECK(sp.value[" var 1 "].asInt64() == -3);
+        CHECK(sp.value[" var 1 "].asInt32() == -3);
         CHECK(sp.value["var 2"].asBool() == 1);
         CHECK(sp.value["var \" 3"].asString() == "abc");
     }
@@ -213,8 +213,8 @@ TEST_CASE("SIN parser") {
                      "   [1] : 123\n"
                      "  ]\n");
         CHECK(sp.error == "");
-        CHECK(sp.value[1].type() == "Int64");
-        CHECK(sp.value[1].asInt64() == 123);
+        CHECK(sp.value[1].type() == "Int32");
+        CHECK(sp.value[1].asInt32() == 123);
     }
 
     SECTION("24") {

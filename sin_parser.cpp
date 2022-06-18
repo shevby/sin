@@ -208,28 +208,24 @@ Sin SinParser::read_sin_value() {
         // try to parse as integer, then as double
         static std::set<char> first_char_of_number = {'-', '+', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
         if (first_char_of_number.contains(sin_type[0])) {
-            try {
-                size_t end_of_int;
-                int64_t value = std::stoll(sin_type, &end_of_int);
-                if (end_of_int != sin_type.size()) {
-                    throw std::invalid_argument("Extra characters");
-                }
-                return value;
-            }
-            catch (std::invalid_argument &e1) {
-                try {
-                    size_t end_of_var;
-                    double value = std::stod(sin_type, &end_of_var);
-                    if (end_of_var != sin_type.size()) {
-                        throw std::invalid_argument("Extra characters");
-                    }
-                    return value;
-                }
-                catch (std::invalid_argument &e2) {
-                    error +="\nCannot parse number: '" + sin_type + "' at line " + std::to_string(line_number);
-                    return {};
-                }
-            }
+#define PARSE_NUMBER_TYPE_NOT_SPECIFIED(STANDARD_TYPE, CONVERTER)            \
+            try {                                                            \
+                size_t end_of_var;                                           \
+                STANDARD_TYPE value = std::CONVERTER(sin_type, &end_of_var); \
+                if (end_of_var != sin_type.size()) {                         \
+                    throw std::runtime_error("not parsed");                  \
+                }                                                            \
+                return value;                                                \
+            }                                                                \
+            catch(...) {}
+
+            PARSE_NUMBER_TYPE_NOT_SPECIFIED(int,      stoi);
+            PARSE_NUMBER_TYPE_NOT_SPECIFIED(int64_t,  stoll);
+            PARSE_NUMBER_TYPE_NOT_SPECIFIED(uint64_t, stoull);
+            PARSE_NUMBER_TYPE_NOT_SPECIFIED(double,   stod);
+
+            error +="\nCannot parse number: '" + sin_type + "' at line " + std::to_string(line_number);
+            return {};
         }
 
         skip_whitespace();
