@@ -18,6 +18,6 @@ add_library(${LIB_NAME} SHARED ${SOURCES})
 
 include_directories(".")
 
-if(BUILD_TEST) 
+if(BUILD_TEST)
   add_subdirectory(test)
 endif()

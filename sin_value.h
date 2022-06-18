@@ -8,18 +8,17 @@
 class Sin;
 
 #define SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(SIN_TYPE, STANDARD_TYPE) \
-    struct SIN_TYPE : SinValue {\
-        STANDARD_TYPE value;\
-        SIN_TYPE(STANDARD_TYPE v): SinValue{}, value{v} {}\
+    struct SIN_TYPE : SinValue                                      \
+    {                                                               \
+        STANDARD_TYPE value;                                        \
+        SIN_TYPE(STANDARD_TYPE v) : SinValue{}, value{v} {}         \
     }
 
-
-
-struct SinValue {
+struct SinValue
+{
     SinValue(){};
     virtual ~SinValue(){};
 };
-
 
 SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Uint8, uint8_t);
 SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Int8, int8_t);
@@ -36,15 +35,17 @@ SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Ulong, unsigned long);
 SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(String, std::string);
 SIN_DEFINE_STANDARD_TYPE_SIN_VALUE(Bool, bool);
 
-
-struct Array : SinValue {
+struct TArray : SinValue
+{
     std::vector<Sin> value;
 };
 
-struct Object : SinValue {
+struct TObject : SinValue
+{
     std::map<std::string, Sin> value;
 };
 
-struct Undefined : SinValue {
+struct Undefined : SinValue
+{
     const std::string value = "Undefined";
 };

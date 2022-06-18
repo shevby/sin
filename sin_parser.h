@@ -5,11 +5,13 @@
 
 #include "sin.h"
 
-class SinParser {
+class SinParser
+{
 public:
     SinParser(const std::string &str);
     Sin value;
     std::string error;
+
 private:
     size_t line_number = 0;
     std::stringstream ss;
@@ -29,4 +31,3 @@ private:
     std::string read_var_type();
     std::string read_string();
 };
-

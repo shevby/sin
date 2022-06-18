@@ -9,10 +9,10 @@
 #include "sin_value.h"
 #include "switch.h"
 
-#define SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(SIN_TYPE, STANDARD_TYPE)\
-    Sin(const STANDARD_TYPE & value);\
-    void operator=(STANDARD_TYPE & value);\
-    STANDARD_TYPE as ## SIN_TYPE() const;
+#define SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(SIN_TYPE, STANDARD_TYPE) \
+    Sin(const STANDARD_TYPE &value);                                    \
+    void operator=(STANDARD_TYPE &value);                               \
+    STANDARD_TYPE as##SIN_TYPE() const;
 
 class Sin
 {
@@ -23,10 +23,10 @@ class Sin
 
 public:
     Sin();
-    Sin(const char * str);
+    Sin(const char *str);
     Sin(std::initializer_list<Sin> list);
 
-	static Sin parse(const std::string &str);
+    static Sin parse(const std::string &str);
 
     std::string type();
 
@@ -43,15 +43,19 @@ public:
     SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(String, std::string);
     SIN_DEFINE_STANDARD_TYPE_SETTER_GETTER(Bool, bool);
 
-    std::vector<Sin> & asArray();
+    std::vector<Sin> &asArray();
 
-    std::map<std::string, Sin> & asObject();
+    std::map<std::string, Sin> &asObject();
 
-    Sin & operator[](const int index);
+    Sin &operator[](const int index);
 
-    Sin & operator[](const std::string & key);
+    Sin &operator[](const std::string &key);
 
     std::string toString();
+
+    static Sin Array();
+
+    static Sin Object();
 
 private:
     std::string numberToString(int pads = 0);
