@@ -231,6 +231,17 @@ Sin SinParser::read_sin_value() {
         skip_whitespace();
         std::string sin_value = read_number();
 
+        if (sin_value == "") {
+            error += "\nNumber is empty at line " + std::to_string(line_number);
+            return {};
+        }
+
+        // Unsigned numbers starting with '-' are not valid
+        if (sin_type[0] == 'U' && sin_value[0] == '-') {
+            error += std::string("\nOut of bounds. Can't parse '") + sin_value + "' at line " + std::to_string(line_number);
+            return {};
+        }
+
         if (sin_type == "Bool") {
             if (sin_value == "false") {
                 return false;
@@ -241,28 +252,33 @@ Sin SinParser::read_sin_value() {
             error += "\nInvalid boolean value: " + sin_value + " at line " + std::to_string(line_number);
             return {};
         }
-#define PARSE_NUMBER(SIN_TYPE, STANDARD_TYPE, CONVERTER)                                                                            \
-        else if (sin_type == #SIN_TYPE) {                                                                                           \
-            try {                                                                                                                   \
-                STANDARD_TYPE value = std::CONVERTER(sin_value);                                                                    \
-                return value;                                                                                                       \
-            }                                                                                                                       \
-            catch (std::invalid_argument &e) {                                                                                      \
-                error += std::string("\n") + e.what() + ". Can't parse '" + sin_value + "' at line " + std::to_string(line_number); \
-                return {};                                                                                                          \
-            }                                                                                                                       \
+#define PARSE_NUMBER(SIN_TYPE, STANDARD_TYPE, CONVERTER, CHECK_LIMIT, MIN_VALUE, MAX_VALUE)                                          \
+        else if (sin_type == #SIN_TYPE) {                                                                                            \
+            try {                                                                                                                    \
+                auto value = std::CONVERTER(sin_value);                                                                              \
+                if (CHECK_LIMIT && (value < MIN_VALUE || value > MAX_VALUE)) {                                                       \
+                    error += std::string("\nOut of bounds. Can't parse '") + sin_value + "' at line " + std::to_string(line_number); \
+                    return {};                                                                                                       \
+                }                                                                                                                    \
+                return (STANDARD_TYPE)value;                                                                                         \
+            }                                                                                                                        \
+            catch (std::exception &e) {                                                                                              \
+                error += std::string("\n") + e.what() + ". Can't parse '" + sin_value + "' at line " + std::to_string(line_number);  \
+                return {};                                                                                                           \
+            }                                                                                                                        \
         }
-        PARSE_NUMBER(Int8,  int8_t,  stoll)
-        PARSE_NUMBER(Int16, int16_t, stoll)
-        PARSE_NUMBER(Int32, int32_t, stoll)
-        PARSE_NUMBER(Int64, int64_t, stoll)
 
-        PARSE_NUMBER(Uint8,  int8_t,  stoull)
-        PARSE_NUMBER(Uint16, int16_t, stoull)
-        PARSE_NUMBER(Uint32, int32_t, stoull)
-        PARSE_NUMBER(Uint64, int64_t, stoull)
+        PARSE_NUMBER(Int8,   int8_t,   stoll,  true,   -0x80ll,       0x7Fll)
+        PARSE_NUMBER(Int16,  int16_t,  stoll,  true,   -0x8000ll,     0x7FFFll)
+        PARSE_NUMBER(Int32,  int32_t,  stoll,  true,   -0x80000000ll, 0x7FFFFFFFll)
+        PARSE_NUMBER(Int64,  int64_t,  stoll,  false,  0,             0)
 
-        PARSE_NUMBER(Double, double, stod)
+        PARSE_NUMBER(Uint8,  uint8_t,  stoull, true,   0,             0xFFull)
+        PARSE_NUMBER(Uint16, uint16_t, stoull, true,   0,             0xFFFFull)
+        PARSE_NUMBER(Uint32, uint32_t, stoull, true,   0,             0xFFFFFFFFull)
+        PARSE_NUMBER(Uint64, uint64_t, stoull, false,  0,             0)
+
+        PARSE_NUMBER(Double, double,   stod,   false,  0,             0)
 
         else {
             error += "\nUnsupported type: " + sin_type + " at line " + std::to_string(line_number);

@@ -3,6 +3,100 @@
 
 #include "sin_parser.h"
 
+TEST_CASE("SIN parser: integer values out of bounds") {
+    // Unsigned
+    SECTION("Uint8 - Low") {
+        SinParser sp(":Uint8 -1");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Uint8 - High") {
+        SinParser sp(":Uint8 256");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Uint16 - Low") {
+        SinParser sp(":Uint16 -1");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Uint16 - High") {
+        SinParser sp(":Uint16 65536");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Uint32 - Low") {
+        SinParser sp(":Uint32 -1");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Uint32 - High") {
+        SinParser sp(":Uint32 4294967296");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Uint64 - Low") {
+        SinParser sp(":Uint64 -1");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Uint64 - High") {
+        SinParser sp(":Uint64 18446744073709551616");
+        CHECK(sp.error != "");
+    }
+
+    // Signed
+    SECTION("Int8 - Low") {
+        SinParser sp(":Int8 -129");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Int8 - High") {
+        SinParser sp(":Int8 128");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Int16 - Low") {
+        SinParser sp(":Int16 -32769");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Int16 - High") {
+        SinParser sp(":Int16 32768");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Int32 - Low") {
+        SinParser sp(":Int32 -2147483649");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Int32 - High") {
+        SinParser sp(":Int32 2147483648");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Int - Low") {
+        SinParser sp(":Int -2147483649");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Int - High") {
+        SinParser sp(":Int 2147483648");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Int64 - Low") {
+        SinParser sp(":Int64 -9223372036854775809");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Int64 - High") {
+        SinParser sp(":Int64 9223372036854775808");
+        CHECK(sp.error != "");
+    }
+}
+
 TEST_CASE("SIN parser") {
     SECTION("1") {
         SinParser sp(":Int32\n1");
