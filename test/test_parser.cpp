@@ -168,6 +168,30 @@ TEST_CASE("SIN parser: booleans") {
         SinParser sp(":Bool \"true\"");
         CHECK(sp.error != "");
     }
+
+    SECTION("Bad bool 5")
+    {
+        SinParser sp(":Bool True");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Bad bool 6")
+    {
+        SinParser sp(":Bool False");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Bad bool 7")
+    {
+        SinParser sp(":True");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Bad bool 8")
+    {
+        SinParser sp(":False");
+        CHECK(sp.error != "");
+    }
 }
 
 TEST_CASE("SIN parser")
