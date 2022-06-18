@@ -116,6 +116,60 @@ TEST_CASE("SIN parser: integer values out of bounds")
     }
 }
 
+TEST_CASE("SIN parser: booleans") {
+    SECTION("True 1") {
+        SinParser sp(":true");
+        CHECK(sp.error == "");
+        CHECK(sp.value.type() == "Bool");
+        CHECK(sp.value.asBool() == true);
+    }
+
+    SECTION("True 2") {
+        SinParser sp(":Bool true");
+        CHECK(sp.error == "");
+        CHECK(sp.value.type() == "Bool");
+        CHECK(sp.value.asBool() == true);
+    }
+
+    SECTION("False 1") {
+        SinParser sp(":false");
+        CHECK(sp.error == "");
+        CHECK(sp.value.type() == "Bool");
+        CHECK(sp.value.asBool() == false);
+    }
+
+    SECTION("False 2") {
+        SinParser sp(":Bool false");
+        CHECK(sp.error == "");
+        CHECK(sp.value.type() == "Bool");
+        CHECK(sp.value.asBool() == false);
+    }
+
+    SECTION("Bad bool 1")
+    {
+        SinParser sp(":Bool cat");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Bad bool 2")
+    {
+        SinParser sp(":Bool 0");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Bad bool 3")
+    {
+        SinParser sp(":Bool 1");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Bad bool 4")
+    {
+        SinParser sp(":Bool \"true\"");
+        CHECK(sp.error != "");
+    }
+}
+
 TEST_CASE("SIN parser")
 {
     SECTION("1")
@@ -215,20 +269,6 @@ TEST_CASE("SIN parser")
         CHECK(sp.value[1]["one"]["a"].asInt8() == 3);
         CHECK(sp.value[1]["one"]["b"][4].asInt32() == 7);
         CHECK(sp.value[3].asInt8() == 4);
-    }
-
-    SECTION("9")
-    {
-        SinParser sp(":false");
-        CHECK(sp.error == "");
-        CHECK(sp.value.asBool() == 0);
-    }
-
-    SECTION("10")
-    {
-        SinParser sp(":Bool true");
-        CHECK(sp.error == "");
-        CHECK(sp.value.asBool() == 1);
     }
 
     SECTION("11")
