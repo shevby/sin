@@ -3,6 +3,8 @@
 #include <sstream>
 #include <string>
 
+#include "sin.h"
+
 class SinParser {
 public:
     SinParser(const std::string &str);
