@@ -1,9 +1,7 @@
 #ifndef SWITCH_H
 #define SWITCH_H
 
-#include <string>
 #include <functional>
-#include <iostream>
 #include <vector>
 
 class Switchable
