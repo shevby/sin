@@ -93,14 +93,16 @@ TEST_CASE("SIN parser: integer values out of bounds")
 
     SECTION("Int - Low")
     {
-        SinParser sp(":Int -2147483649");
-        CHECK(sp.error != "");
+        SinParser sp(":-2147483649");
+        CHECK(sp.value.type() == "Int64");
+        CHECK(sp.error == "");
     }
 
     SECTION("Int - High")
     {
-        SinParser sp(":Int 2147483648");
-        CHECK(sp.error != "");
+        SinParser sp(": 2147483648");
+        CHECK(sp.value.type() == "Int64");
+        CHECK(sp.error == "");
     }
 
     SECTION("Int64 - Low")
@@ -113,6 +115,119 @@ TEST_CASE("SIN parser: integer values out of bounds")
     {
         SinParser sp(":Int64 9223372036854775808");
         CHECK(sp.error != "");
+    }
+}
+
+TEST_CASE("SIN parser: integer values - smallest and larget values")
+{
+    // Unsigned
+    SECTION("Uint8 - Low")
+    {
+        SinParser sp(":Uint8 0");
+        CHECK(sp.error == "");
+    }
+
+    SECTION("Uint8 - High")
+    {
+        SinParser sp(":Uint8 255");
+        CHECK(sp.error == "");
+    }
+
+    SECTION("Uint16 - Low")
+    {
+        SinParser sp(":Uint16 0");
+        CHECK(sp.error == "");
+    }
+
+    SECTION("Uint16 - High")
+    {
+        SinParser sp(":Uint16 65535");
+        CHECK(sp.error == "");
+    }
+
+    SECTION("Uint32 - Low")
+    {
+        SinParser sp(":Uint32 0");
+        CHECK(sp.error == "");
+    }
+
+    SECTION("Uint32 - High")
+    {
+        SinParser sp(":Uint32 4294967295");
+        CHECK(sp.error == "");
+    }
+
+    SECTION("Uint64 - Low")
+    {
+        SinParser sp(":Uint64 0");
+        CHECK(sp.error == "");
+    }
+
+    SECTION("Uint64 - High")
+    {
+        SinParser sp(":Uint64 18446744073709551615");
+        CHECK(sp.error == "");
+    }
+
+    // Signed
+    SECTION("Int8 - Low")
+    {
+        SinParser sp(":Int8 -128");
+        CHECK(sp.error == "");
+    }
+
+    SECTION("Int8 - High")
+    {
+        SinParser sp(":Int8 127");
+        CHECK(sp.error == "");
+    }
+
+    SECTION("Int16 - Low")
+    {
+        SinParser sp(":Int16 -32768");
+        CHECK(sp.error == "");
+    }
+
+    SECTION("Int16 - High")
+    {
+        SinParser sp(":Int16 32767");
+        CHECK(sp.error == "");
+    }
+
+    SECTION("Int32 - Low")
+    {
+        SinParser sp(":Int32 -2147483648");
+        CHECK(sp.error == "");
+    }
+
+    SECTION("Int32 - High")
+    {
+        SinParser sp(":Int32 2147483647");
+        CHECK(sp.error == "");
+    }
+
+    SECTION("Int - Low")
+    {
+        SinParser sp(":-2147483648");
+        CHECK(sp.error == "");
+    }
+
+    SECTION("Int - High")
+    {
+        SinParser sp(":2147483647");
+        CHECK(sp.error == "");
+    }
+
+    SECTION("Int64 - Low")
+    {
+        SinParser sp(":Int64 -9223372036854775808");
+        CHECK(sp.error == "");
+    }
+
+    SECTION("Int64 - High")
+    {
+        SinParser sp(":Int64 9223372036854775807");
+        CHECK(sp.error == "");
     }
 }
 
@@ -166,6 +281,30 @@ TEST_CASE("SIN parser: booleans") {
     SECTION("Bad bool 4")
     {
         SinParser sp(":Bool \"true\"");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Bad bool 5")
+    {
+        SinParser sp(":Bool True");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Bad bool 6")
+    {
+        SinParser sp(":Bool False");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Bad bool 7")
+    {
+        SinParser sp(":True");
+        CHECK(sp.error != "");
+    }
+
+    SECTION("Bad bool 8")
+    {
+        SinParser sp(":False");
         CHECK(sp.error != "");
     }
 }
