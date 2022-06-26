@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.5)
-project(Sin VERSION 0.9.0 LANGUAGES CXX)
+project(Sin VERSION 1.0.1 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(LIB_NAME sin)
 
-option(BUILD_TEST "Build catch2 tests" ON)
+option(BUILD_TEST "Build catch2 tests" OFF)
 
 set(SOURCES
   sin.cpp

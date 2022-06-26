@@ -1,4 +1,5 @@
-set(TEST_MAIN test)
+set(TEST_MAIN test_sin)
+
 set(TEST_SOURCES
   main.cpp
   test_parser.cpp
@@ -22,4 +23,10 @@ target_link_libraries(
   ${TEST_MAIN}
   PRIVATE
   Catch2::Catch2WithMain
+)
+
+set_target_properties(
+  ${TEST_MAIN}
+  PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test"
 )
