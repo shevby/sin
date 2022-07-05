@@ -2,6 +2,7 @@
 #include "catch2/catch_test_macros.hpp"
 
 #include "sin_parser.h"
+#include "sin_parser_impl.h"
 
 TEST_CASE("SIN parser: integer values out of bounds")
 {

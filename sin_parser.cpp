@@ -1,8 +1,10 @@
 #include <memory>
 #include <vector>
+#include <map>
 
 #include "sin.h"
 #include "sin_parser.h"
+#include "sin_parser_impl.h"
 #include "sin_value.h"
 
 const std::set<char> whitespace = {' ', '\t', '\n', '\r'};
@@ -445,4 +447,16 @@ Sin SinParser::read_sin_value()
 SinParser::SinParser(const std::string &str) : ss(str)
 {
     value = read_sin_value();
+}
+
+Sin parseSin(const std::string &str)
+{
+    auto parser = SinParser(str);
+
+    if (parser.error != "") {
+        std::string error = "Can't parse configuration: " + parser.error;
+        throw std::invalid_argument(error);
+    }
+
+    return parser.value;
 }

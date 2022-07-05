@@ -28,12 +28,7 @@ Sin::Sin(std::initializer_list<Sin> list)
 
 Sin Sin::parse(const std::string &str)
 {
-    auto parser = SinParser(str);
-    if (parser.error != "") {
-        std::string error = "Can't parse configuration: " + parser.error;
-        throw std::invalid_argument(error);
-    }
-    return SinParser(str).value;
+    return parseSin(str);
 }
 
 #define SIN_STANDARD_TYPE_SETTER_GETTER(SIN_TYPE, STANDARD_TYPE)                                               \
